@@ -1,6 +1,6 @@
 GIT
   remote: git@gitlab.com:kuebiko/ruby-kuebiko.git
-  revision: dd3b8b83e09972c4f9d5cc4351911164e2206de0
+  revision: 38f72e6c4bc1043eb547d1e806ad65a6a1e28e80
   branch: master
   specs:
     kuebiko (0.0.1)
