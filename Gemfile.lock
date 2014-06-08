@@ -1,0 +1,71 @@
+GIT
+  remote: git@gitlab.com:kuebiko/ruby-kuebiko.git
+  revision: dd3b8b83e09972c4f9d5cc4351911164e2206de0
+  branch: master
+  specs:
+    kuebiko (0.0.1)
+      celluloid
+      hashie (~> 2.1)
+      mosquitto
+      virtus (~> 1.0.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    addressable (2.3.6)
+    axiom-types (0.1.1)
+      descendants_tracker (~> 0.0.4)
+      ice_nine (~> 0.11.0)
+      thread_safe (~> 0.3, >= 0.3.1)
+    buftok (0.2.0)
+    celluloid (0.15.2)
+      timers (~> 1.1.0)
+    celluloid-io (0.15.0)
+      celluloid (>= 0.15.0)
+      nio4r (>= 0.5.0)
+    coercible (1.0.0)
+      descendants_tracker (~> 0.0.1)
+    descendants_tracker (0.0.4)
+      thread_safe (~> 0.3, >= 0.3.1)
+    equalizer (0.0.9)
+    faraday (0.9.0)
+      multipart-post (>= 1.2, < 3)
+    hashie (2.1.1)
+    http (0.6.1)
+      http_parser.rb (~> 0.6.0)
+    http_parser.rb (0.6.0)
+    ice_nine (0.11.0)
+    json (1.8.1)
+    memoizable (0.4.2)
+      thread_safe (~> 0.3, >= 0.3.1)
+    mosquitto (0.3)
+    multipart-post (2.0.0)
+    naught (1.0.0)
+    nio4r (1.0.0)
+    simple_oauth (0.2.0)
+    thread_safe (0.3.4)
+    timers (1.1.0)
+    twitter (5.9.0)
+      addressable (~> 2.3)
+      buftok (~> 0.2.0)
+      equalizer (~> 0.0.9)
+      faraday (~> 0.9.0)
+      http (~> 0.6.0)
+      http_parser.rb (~> 0.6.0)
+      json (~> 1.8)
+      memoizable (~> 0.4.0)
+      naught (~> 1.0)
+      simple_oauth (~> 0.2.0)
+    virtus (1.0.2)
+      axiom-types (~> 0.1)
+      coercible (~> 1.0)
+      descendants_tracker (~> 0.0.3)
+      equalizer (~> 0.0.9)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  celluloid-io
+  kuebiko!
+  twitter
