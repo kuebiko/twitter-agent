@@ -1,10 +1,7 @@
 require 'twitter'
 
-require 'celluloid/io'
-require 'celluloid/autostart'
-
 class TwitterAgent < Kuebiko::Agent
-  include Celluloid::IO
+  RESOURCE_TOPIC = 'resources/twitter/tweet'
 
   attr_accessor :rest_client, :stream_client
 
@@ -12,9 +9,31 @@ class TwitterAgent < Kuebiko::Agent
     super
 
     @stream_client = TwitterStreamClient.new
+    @stream_client.add_callback(:on_tweet, method(:handle_new_tweet))
 
     # Send credentials request and register callback
     request_credentials
+  end
+
+  def handle_new_tweet(tweet)
+    msg = Kuebiko::Message.new send_to: [RESOURCE_TOPIC]
+
+    msg.payload = Kuebiko::MessagePayload::Document.new.tap do |pl|
+      pl.agent_type = self.class.name
+
+      pl.created_at = tweet.created_at
+      pl.mime_type = 'application/json'
+      pl.language_code = tweet.lang
+
+      pl.source = 'Twitter API'
+      pl.source_id = tweet.id
+
+      pl.geolocation = tweet.geo.to_h
+
+      pl.content = tweet.to_h
+    end
+
+    dispatcher.send(msg)
   end
 
   def request_credentials

@@ -1,5 +1,15 @@
+require 'celluloid/io'
+require 'celluloid/autostart'
+
 class TwitterStreamClient
   include Celluloid::IO
+
+  def initialize
+    @callbacks = {
+      on_tweet: [],
+      on_delete: []
+    }
+  end
 
   # Initializes Stream and REST twitter clients with authentication information
   #
@@ -17,31 +27,24 @@ class TwitterStreamClient
     # @rest_client = Twitter::REST::Client.new
     @stream_client = Twitter::Streaming::Client.new(connection_opts)
 
-    puts credentials.inspect
-
     @stream_client.consumer_key = credentials[:consumer_key]
     @stream_client.consumer_secret = credentials[:consumer_secret]
     @stream_client.access_token = credentials[:oauth_token]
     @stream_client.access_token_secret = credentials[:oauth_token_secret]
 
-    # [@stream_client, @rest_client].each do |client|
-      # client.consumer_key = credentials['consumer_key']
-      # client.consumer_secret = credentials['consumer_secret']
-      # client.access_token = credentials['oauth_token']
-      # client.access_token_secret = credentials['oauth_token_secret']
-    # end
-
-    puts 'Fire this baby up'
     ## Start user stream
     async.loop_user_stream
+  end
+
+  def add_callback(event, callback)
+    @callbacks[event] << callback
   end
 
   def loop_user_stream
     @stream_client.user do |object|
       case object
       when Twitter::Tweet
-        puts "Publishing #{object.text} to MQ"
-        # publisher.publish('resources/found', object.attrs.to_json)
+        @callbacks[:on_tweet].each { |c| c.call(object) }
       when Twitter::Streaming::StallWarning
         warn "Falling behind!"
       end
