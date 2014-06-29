@@ -41,13 +41,18 @@ class TwitterStreamClient
   end
 
   def loop_user_stream
+    # @stream_client.user(replies: 'all') do |object|
     @stream_client.user do |object|
+      p "#{Time.now}: Got #{object.class.name}"
       case object
       when Twitter::Tweet
         @callbacks[:on_tweet].each { |c| c.call(object) }
-      when Twitter::Streaming::StallWarning
-        warn "Falling behind!"
+      else
+        # puts object.to_h if object.respond_to?(:to_h)
+        puts object.inspect
       end
     end
+  rescue StandardError => e
+    puts e.message
   end
 end
