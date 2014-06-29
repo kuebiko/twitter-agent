@@ -5,6 +5,9 @@ class TwitterAgent < Kuebiko::Agent
   RELATIONSHIP_RESOURCE_TOPIC = 'resources/relationship'
   PERSONA_RESOURCE_TOPIC = 'resources/persona'
 
+  SOURCE = 'Twitter API'
+  TWEET_RESOURCE_TYPE = 'twitter.tweet'
+
   attr_accessor :rest_client, :stream_client
 
   def initialize
@@ -27,7 +30,7 @@ class TwitterAgent < Kuebiko::Agent
     msg = Kuebiko::Message.new send_to: [TWEET_RESOURCE_TOPIC]
 
     ## Other resources
-    handle_profile(tweet.user)
+    handle_profile(tweet.user, tweet)
 
     msg.payload = Kuebiko::MessagePayload::Document.new.tap do |pl|
       pl.agent_type = self.class.name
@@ -36,7 +39,8 @@ class TwitterAgent < Kuebiko::Agent
       pl.mime_type = 'application/json'
       pl.language_code = tweet.lang
 
-      pl.source = 'Twitter API'
+      pl.type = TWEET_RESOURCE_TYPE
+      pl.source = SOURCE
       pl.source_id = tweet.id
 
       pl.geolocation = tweet.geo.to_h
@@ -47,7 +51,7 @@ class TwitterAgent < Kuebiko::Agent
     dispatcher.send(msg)
   end
 
-  def handle_profile(profile)
+  def handle_profile(profile, tweet = nil)
     msg = Kuebiko::Message.new send_to: [PERSONA_RESOURCE_TOPIC]
 
     content = profile.to_h
@@ -59,7 +63,7 @@ class TwitterAgent < Kuebiko::Agent
       pl.created_at = profile.created_at
       pl.language_code = profile.lang
 
-      pl.source = 'Twitter API'
+      pl.source = SOURCE
       pl.source_id = profile.id
 
       pl.description = profile.description
@@ -68,10 +72,34 @@ class TwitterAgent < Kuebiko::Agent
     end
 
     dispatcher.send(msg)
+
+    if tweet
+      announce_relationship(
+        :author,
+        { type: TWEET_RESOURCE_TYPE, source: SOURCE, source_id: tweet.id },
+        { type: 'entities.persona',  source: SOURCE, source_id: profile.id }
+      )
+    end
   end
 
-  def handle_mention(mention)
-    msg = Kuebiko::Message.new send_to: [PERSONA_RESOURCE_TOPIC]
+  def handle_mention(tweet, mention)
+    announce_relationship(
+        :mention,
+        { type: TWEET_RESOURCE_TYPE, source: SOURCE, source_id: tweet.id },
+        { type: 'entities.persona' , source: SOURCE, source_id: mention.id }
+      )
+  end
+
+  def announce_relationship(type, left, right)
+    msg = Kuebiko::Message.new send_to: [RELATIONSHIP_RESOURCE_TOPIC]
+
+    msg.payload = Kuebiko::MessagePayload::ResourceRelationship.new(
+      start_resource: left,
+      end_resource: right,
+      type: type
+    )
+
+    dispatcher.send(msg)
   end
 
   def request_credentials
