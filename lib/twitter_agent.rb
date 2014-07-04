@@ -3,7 +3,7 @@ require 'twitter'
 class TwitterAgent < Kuebiko::Agent
   TWEET_RESOURCE_TOPIC = 'resources/twitter/tweet'
   RELATIONSHIP_RESOURCE_TOPIC = 'resources/relationship'
-  PERSONA_RESOURCE_TOPIC = 'resources/persona'
+  PERSONA_RESOURCE_TOPIC = 'entities/persona'
 
   SOURCE = 'Twitter API'
   TWEET_RESOURCE_TYPE = 'twitter.tweet'
