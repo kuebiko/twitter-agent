@@ -4,6 +4,8 @@ require 'celluloid/autostart'
 class TwitterStreamClient
   include Celluloid::IO
 
+  attr_accessor :stream_client
+
   def initialize
     @callbacks = {
       on_tweet: [],

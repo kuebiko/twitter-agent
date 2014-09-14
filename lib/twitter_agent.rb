@@ -30,7 +30,19 @@ class TwitterAgent < Kuebiko::Agent
     msg = Kuebiko::Message.new send_to: [TWEET_RESOURCE_TOPIC]
 
     ## Other resources
-    handle_profile(tweet.user, tweet)
+    handle_profile(tweet.user, tweet) # Author
+    tweet.user_mentions.each { |m| handle_mention(tweet, m) }
+
+    # Content to send over
+    content = tweet.to_h
+
+    # Filter out the stuff we'll keep in the metadata
+    content.delete(:user)
+    content[:entities].delete(:user_mentions)
+    content.delete(:lang)
+    content.delete(:geo)
+    # content.delete(:created_at)
+    content.delete(:id)
 
     msg.payload = Kuebiko::MessagePayload::Document.new.tap do |pl|
       pl.agent_type = self.class.name
@@ -45,11 +57,15 @@ class TwitterAgent < Kuebiko::Agent
 
       pl.geolocation = tweet.geo.to_h
 
-      pl.content = tweet.to_h
+      pl.content = content
     end
 
     dispatcher.send(msg)
   end
+
+  # def handle_ping(_ = nil)
+    # puts @stream_client.stream_client.instance_variable_get(:@connection).instance_variable_get(:@)
+  # end
 
   def handle_profile(profile, tweet = nil)
     msg = Kuebiko::Message.new send_to: [PERSONA_RESOURCE_TOPIC]
