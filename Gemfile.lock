@@ -1,13 +1,13 @@
 GIT
   remote: git@gitlab.com:kuebiko/ruby-kuebiko.git
-  revision: 64cde2bcf7ce7602fadea7c6c84d509893330347
+  revision: 103a1edec39a46a7f22c95ae550b849de9277060
   branch: master
   specs:
-    kuebiko (0.0.1)
+    kuebiko (0.0.2)
       celluloid
-      hashie (>= 2.1)
+      hashie
       mosquitto
-      virtus (>= 1.0.2)
+      virtus
 
 GEM
   remote: https://rubygems.org/
@@ -19,7 +19,7 @@ GEM
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
     buftok (0.2.0)
-    byebug (3.4.0)
+    byebug (3.5.1)
       columnize (~> 0.8)
       debugger-linecache (~> 1.2)
       slop (~> 3.6)
