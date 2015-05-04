@@ -1,4 +1,5 @@
 require 'twitter'
+require_relative 'twitter_extension'
 
 class TwitterAgent < Kuebiko::Agent
   TWEET_RESOURCE_TOPIC = 'resources/twitter/tweet'
