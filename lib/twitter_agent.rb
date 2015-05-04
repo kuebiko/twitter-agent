@@ -35,15 +35,17 @@ class TwitterAgent < Kuebiko::Agent
     tweet.user_mentions.each { |m| handle_mention(tweet, m) }
 
     # Content to send over
-    content = tweet.to_h
+    metadata = tweet.to_h
 
     # Filter out the stuff we'll keep in the metadata
-    content.delete(:user)
-    content[:entities].delete(:user_mentions)
-    content.delete(:lang)
-    content.delete(:geo)
-    # content.delete(:created_at)
-    content.delete(:id)
+    metadata.delete(:user)
+    metadata[:entities].delete(:user_mentions)
+    metadata.delete(:lang)
+    metadata.delete(:geo)
+    metadata.delete(:coordinates)
+    metadata.delete(:text)
+    # metadata.delete(:created_at)
+    metadata.delete(:id)
 
     msg.payload = Kuebiko::MessagePayload::Document.new.tap do |pl|
       pl.agent_type = self.class.name
@@ -56,9 +58,13 @@ class TwitterAgent < Kuebiko::Agent
       pl.source = SOURCE
       pl.source_id = tweet.id
 
-      pl.geolocation = tweet.geo.to_h
+      pl.geolocation = tweet.attrs[:coordinates].to_h
 
-      pl.content = content
+      pl.mime_type = 'text/plain'
+      pl.content = tweet.full_text
+
+      pl.keywords = tweet.hashtags.map(&:text) if tweet.hashtags?
+      pl.metadata = metadata
     end
 
     dispatcher.send(msg)
